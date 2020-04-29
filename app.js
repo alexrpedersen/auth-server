@@ -1,35 +1,28 @@
 'use strict';
 
-// 3rd Party Resources
+const basicAuth = require('./middleware/basic-auth-middleware.js');
+const users = require('./auth/users-model.js');
 const express = require('express');
-const basicAuth = require('./basic-auth-middleware.js');
-const users = require('./users.js');
+const morgan = require('morgan');
+const cors = require('cors');
 
-// Prepare the express app
+//middleware routes
+const router = require('./auth/routes.js');
+
 const app = express();
+app.use(cors());
+app.use(morgan('dev'));
 
-// App Level MW
+// will parse the req body on post and put request
+app.use(router);
 app.use(express.json());
-
-// echo '{"username":"john","password":"foo"}' | http post :3000/signup
-app.post('/signup', (req, res) => {
-  // Could all of this logic actually happen in the model?
-  users.save(req.body)
-    .then(user => {
-      let token = users.generateToken(user);
-      res.status(200).send(token);
-    })
-    .catch(e => { res.status(403).send("Error Creating User"); });
-});
-
-// http post :3000/signin -a john:foo
-app.post('/signin', basicAuth, (req, res) => {
-  res.status(200).send(req.token);
-});
-
-app.get('/users', basicAuth, (req, res) => {
-  res.status(200).json(users.list());
-});
+app.use(express.static('./public'));
+app.use(express.urlencoded({extended: true}));
 
 
-app.listen(3000, () => console.log('server up'));
+module.exports = {
+  server: app,
+  start: port => {
+    app.listen(port, () => console.log(`server up: ${port}`));
+  }
+};
