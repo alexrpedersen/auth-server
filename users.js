@@ -50,8 +50,22 @@ users.methods.comparePassword = function(password) {
 // generate a token that will be used in the future for accessing routes in our app
 users.statics.generateToken = function(dbUser) {
   console.log('dbUser:', dbUser);
-  return jwt.sign({userName: dbUser},'Whattttttttttttt');
+  return jwt.sign({userName: dbUser},'Hello');
 };
 
+
+users.statics.authenticateToken = async function (token) {
+  try {
+    let tokenObject = jwt.verify(token, SECRET);
+
+    if(db[tokenObject.userName]) {
+      return Promise.resolve(tokenObject);
+    }
+    else {
+      return Promise.reject();
+    }
+  }
+  catch (e) { return Promise.reject(); }
+}
 
 module.exports = mongoose.model('users', users);
