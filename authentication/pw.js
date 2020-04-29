@@ -22,8 +22,8 @@ async function encrypt(pw, rounds) {
   console.log('hashed pw:', hashed);
 
   let valid = await bcrypt.compare(originalPw, hashed);
-  console.log('compare plain pw with hashed pw:', valid);
+  console.log('correct password:', valid);
 
   let invalid = await bcrypt.compare('wrongpw', hashed);
-  console.log('wrong plain text pw comparison:', invalid);
+  console.log('wrong password:', invalid);
 }
